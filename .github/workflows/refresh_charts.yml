@@ -1,0 +1,39 @@
+name: Refresh charts
+
+on:
+  - workflow_dispatch
+
+jobs:
+  refresh-charts:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - name: Cache Python environment
+      id: cache-python-env
+      uses: actions/cache@v3
+      with:
+        path: .venv
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt', '**/.python-version') }}
+        restore-keys: |
+          ${{ runner.os }}-venv-
+    - name: Install Python environment
+      if: steps.cache-python-env.outputs.cache-hit != 'true'
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+        pip install -r requirements.txt
+    - name: Run project code
+      run: doit
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        author_name: Jeremy Bejarano
+        author_email: jbejarano@uchicago.edu
+        message: 'Update dashboard via GitHub Actions'
+        add: 'docs/*'
+        new_branch: gh-actions-update
