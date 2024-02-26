@@ -34,6 +34,7 @@ jobs:
       run: |
         source .venv/bin/activate
         doit
+        cp -r ./docs/_build/html/* ./docs/
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
       with:
