@@ -39,4 +39,5 @@ jobs:
         default_author: github_actor
         add: 'docs/* --force'
         new_branch: gh-actions-update
+        pull: 'origin gh-actions-update --rebase --autostash'
         push: 'origin gh-actions-update --force'
