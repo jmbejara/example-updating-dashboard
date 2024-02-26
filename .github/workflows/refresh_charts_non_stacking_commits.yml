@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: 'gh-actions-update'
+        ref: ''
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -41,5 +41,5 @@ jobs:
         default_author: github_actor
         add: 'docs/* --force'
         new_branch: gh-actions-update
-        pull: 'origin gh-actions-update --rebase --autostash'
+        pull: 'origin main --rebase --autostash'
         push: 'origin gh-actions-update --force'
