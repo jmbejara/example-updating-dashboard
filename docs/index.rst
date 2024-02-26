@@ -21,7 +21,8 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 
    myst_markdown_demos.md
    ./_notebook_build/_01_example_notebook.ipynb
-   ./_notebook_build/_02_interactive_plot_example.ipynb
+   ./_notebook_build/_02_pca_index_visualizations.ipynb
+   ./_notebook_build/_03_pca_index_dashboard.ipynb
    api.rst
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 

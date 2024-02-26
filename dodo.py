@@ -61,7 +61,7 @@ def copy_notebook_to_folder(notebook_stem, origin_folder, destination_folder):
 def task_pull_fred():
     """ """
     file_dep = ["./src/load_fred.py"]
-    file_output = ["fred.parquet"]
+    file_output = ["fred.csv"]
     targets = [DATA_DIR / "pulled" / file for file in file_output]
 
     return {
@@ -111,40 +111,40 @@ def task_pull_fred():
 #     }
 
 
-def task_summary_stats():
-    """ """
-    file_dep = ["./src/example_table.py"]
-    file_output = [
-        "example_table.tex",
-        "pandas_to_latex_simple_table1.tex",
-    ]
-    targets = [OUTPUT_DIR / file for file in file_output]
+# def task_summary_stats():
+#     """ """
+#     file_dep = ["./src/example_table.py"]
+#     file_output = [
+#         "example_table.tex",
+#         "pandas_to_latex_simple_table1.tex",
+#     ]
+#     targets = [OUTPUT_DIR / file for file in file_output]
 
-    return {
-        "actions": [
-            "ipython ./src/example_table.py",
-            "ipython ./src/pandas_to_latex_demo.py",
-        ],
-        "targets": targets,
-        "file_dep": file_dep,
-        "clean": True,
-    }
+#     return {
+#         "actions": [
+#             "ipython ./src/example_table.py",
+#             "ipython ./src/pandas_to_latex_demo.py",
+#         ],
+#         "targets": targets,
+#         "file_dep": file_dep,
+#         "clean": True,
+#     }
 
 
-def task_example_plot():
-    """Example plots"""
-    file_dep = [Path("./src") / file for file in ["example_plot.py", "load_fred.py"]]
-    file_output = ["example_plot.png"]
-    targets = [OUTPUT_DIR / file for file in file_output]
+# def task_example_plot():
+#     """Example plots"""
+#     file_dep = [Path("./src") / file for file in ["example_plot.py", "load_fred.py"]]
+#     file_output = ["example_plot.png"]
+#     targets = [OUTPUT_DIR / file for file in file_output]
 
-    return {
-        "actions": [
-            "ipython ./src/example_plot.py",
-        ],
-        "targets": targets,
-        "file_dep": file_dep,
-        "clean": True,
-    }
+#     return {
+#         "actions": [
+#             "ipython ./src/example_plot.py",
+#         ],
+#         "targets": targets,
+#         "file_dep": file_dep,
+#         "clean": True,
+#     }
 
 
 def task_convert_notebooks_to_scripts():
@@ -156,7 +156,7 @@ def task_convert_notebooks_to_scripts():
 
     notebooks = [
         "01_example_notebook.ipynb",
-        "02_interactive_plot_example.ipynb",
+        "02_pca_index_visualizations.ipynb",
     ]
     file_dep = [Path("./src") / file for file in notebooks]
     stems = [notebook.split(".")[0] for notebook in notebooks]
@@ -183,7 +183,7 @@ def task_run_notebooks():
     """
     notebooks = [
         "01_example_notebook.ipynb",
-        "02_interactive_plot_example.ipynb",
+        "02_pca_index_visualizations.ipynb",
     ]
     stems = [notebook.split(".")[0] for notebook in notebooks]
 
@@ -215,6 +215,40 @@ def task_run_notebooks():
     }
 
 
+
+def task_run_notebooks_no_clear():
+    """Preps the notebooks for presentation format.
+    Execute notebooks with summary stats and plots and remove metadata.
+    """
+    notebooks = [
+        "03_pca_index_dashboard.ipynb",
+    ]
+    stems = [notebook.split(".")[0] for notebook in notebooks]
+
+    file_dep = [
+        # 'load_other_data.py',
+        *[Path("./src/") / notebook for notebook in notebooks],
+    ]
+
+    targets = [
+        ## Notebooks converted to HTML
+        *[OUTPUT_DIR / f"{stem}.html" for stem in stems],
+    ]
+
+    actions = [
+        *[jupyter_execute_notebook(notebook) for notebook in stems],
+        *[jupyter_to_html(notebook) for notebook in stems],
+        *[copy_notebook_to_folder(notebook, Path("./src"), "./docs/_notebook_build/") for notebook in stems],
+        # *[jupyter_clear_output(notebook) for notebook in stems],
+        # *[jupyter_to_python(notebook, build_dir) for notebook in notebooks_to_run],
+    ]
+    return {
+        "actions": actions,
+        "targets": targets,
+        "task_dep": [],
+        "file_dep": file_dep,
+        "clean": True,
+    }
 
 
 def task_compile_latex_docs():
@@ -252,6 +286,9 @@ def task_compile_sphinx_docs():
         "./docs/index.rst",
         "./docs/myst_markdown_demos.md",
         "./docs/api.rst",
+        "./src/01_example_notebook.ipynb",
+        "./src/02_pca_index_visualizations.ipynb",
+        "./src/03_pca_index_dashboard.ipynb",
     ]
     targets = [
         "./docs/_build/html/index.html",
