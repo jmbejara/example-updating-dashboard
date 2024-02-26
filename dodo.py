@@ -17,7 +17,7 @@ DATA_DIR = Path(config.DATA_DIR)
 # fmt: off
 ## Helper functions for automatic execution of Jupyter notebooks
 def jupyter_execute_notebook(notebook):
-    return f"jupyter nbconvert --execute --to notebook --ClearMetadataPreprocessor.enabled=True --inplace ./src/{notebook}.ipynb"
+    return f"jupyter nbconvert --execute --to notebook --inplace ./src/{notebook}.ipynb"
 def jupyter_to_html(notebook, output_dir=OUTPUT_DIR):
     return f"jupyter nbconvert --to html --output-dir={output_dir} ./src/{notebook}.ipynb"
 def jupyter_to_md(notebook, output_dir=OUTPUT_DIR):
