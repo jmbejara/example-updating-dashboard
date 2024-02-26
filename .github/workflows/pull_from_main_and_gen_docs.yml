@@ -1,9 +1,8 @@
-name: Refresh charts
+name: Pull from main and then refresh charts
 
 on:
-  schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch:
+    workflow_dispatch:
+    push:
 
 jobs:
   refresh-charts:
