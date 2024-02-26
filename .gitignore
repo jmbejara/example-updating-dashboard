@@ -17,6 +17,7 @@ Exclude data folder
 temp*.csv
 */_build/
 */_notebook_build/
+/output/*
 
 ###################
 # Product Specific
