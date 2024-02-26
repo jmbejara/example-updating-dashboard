@@ -28,7 +28,7 @@ jobs:
         source .venv/bin/activate
         pip install -r requirements.txt
     - name: Run project code
-      run: doit
+      run: python -m doit
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
       with:
