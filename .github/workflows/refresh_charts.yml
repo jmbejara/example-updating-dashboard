@@ -36,8 +36,6 @@ jobs:
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
       with:
-        author_name: Jeremy Bejarano
-        author_email: jbejarano@uchicago.edu
-        message: 'Update dashboard via GitHub Actions'
+        default_author: github_actor
         add: 'docs/*'
         new_branch: gh-actions-update
