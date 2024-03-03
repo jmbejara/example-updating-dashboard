@@ -25,6 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = (BASE_DIR / config('DATA_DIR', default=Path('data'), cast=Path)).resolve()
 OUTPUT_DIR = (BASE_DIR / config('OUTPUT_DIR', default=Path('output'), cast=Path)).resolve()
 WRDS_USERNAME = config("WRDS_USERNAME", default="")
+OUTPUT_DIR = f"{OUTPUT_DIR}"
+DATA_DIR = f"{DATA_DIR}"
 
 if __name__ == "__main__":
     

@@ -6,7 +6,7 @@ import sys
 sys.path.insert(1, "./src/")
 
 
-import config
+from src import config
 from pathlib import Path
 from doit.tools import run_once
 import platform
