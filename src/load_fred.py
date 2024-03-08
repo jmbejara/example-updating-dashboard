@@ -13,7 +13,7 @@ fred_series_long_names = {
     "DGS10": "Market Yield on U.S. Treasury Securities at 10-Year Constant Maturity",
     "T10Y2Y": "10-Year Treasury Constant Maturity Minus 2-Year Treasury Constant Maturity",
     "VIXCLS": "CBOE Volatility Index: VIX",
-    # "GDP": "Gross Domestic Product",
+    "GDP": "Gross Domestic Product",
 }
 
 fred_series_short_names = {
@@ -24,7 +24,7 @@ fred_series_short_names = {
     "DGS10": "10-Year Treasury",
     "T10Y2Y": "10Y-2Y Spread",
     "VIXCLS": "VIX",
-    # "GDP": "GDP",
+    "GDP": "GDP",
 }
 
 
