@@ -27,7 +27,7 @@ def transform_series(df):
     dfn["VIX"] = df["VIX"]
     dfn["CP - Treasury Spread, 3m"] = df["90-Day AA Fin CP"] - df["10-Year Treasury"]
     # dfn['NASDAQ/GDP'] = df['NASDAQ']/(df['GDP'].ffill())
-    dfn["NASDAQ Ret (transformed)"] = (
+    dfn["NASDAQ (transformed)"] = (
         df["NASDAQ"].pct_change().rolling(90, min_periods=1).mean()
         - df["NASDAQ"].pct_change().mean()
     )
@@ -209,6 +209,7 @@ def plot_unnormalized_series(df):
 def plot_normalized_series(dfn):
     series_names = [
         "High Yield Index OAS",
+        "NASDAQ (trasformed),
         "10Y-2Y Spread",
         "VIX",
         "CP - Treasury Spread, 3m",
