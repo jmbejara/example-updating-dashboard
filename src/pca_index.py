@@ -209,8 +209,11 @@ def plot_unnormalized_series(df):
 def plot_normalized_series(dfn):
     series_names = [
         "High Yield Index OAS",
-        "NASDAQ Ret (trasformed),
-        "10Y-2Y Spread"
+        "10Y-2Y Spread",
+        "VIX",
+        "CP - Treasury Spread, 3m",
+        "NASDAQ Ret (transformed)",
+        "10-Year Treasury (transformed)",
     ]
 
     # Assume dfn is your dataframe and has the series_names as columns
