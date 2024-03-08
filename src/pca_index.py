@@ -297,5 +297,5 @@ def _demo():
         .rename(columns={0: "value", "level_1": "variable"})
     )
 
-    fig = px.bar(dfn_long, x="DATE", y="value", color="variable", title="Long-Form Input")
+    fig = px.bar(dfn_long, x="DATE", y="value", color="variable", title="Long-Form Input Table")
     fig.show()
