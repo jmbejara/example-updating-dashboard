@@ -5,6 +5,9 @@ Maxwell Dender Custom Title Edit (Project Title HERE)
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
+![image](https://github.com/maxwelldender/example-updating-dashboard/assets/156535265/9fd96ea4-bbc0-4bee-b358-cca8dbe162b1)
+
+
 # Quick Start
 
 To quickest way to run code in this repo is to use the following steps. First, note that you must have TexLive installed on your computer and available in your path.
