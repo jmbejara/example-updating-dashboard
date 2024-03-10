@@ -130,7 +130,7 @@ def pc1_line_plot(pc1):
 
     data = [trace]
     layout = dict(
-        title="First Principal Component (PC1)",
+        title="MAXWELL CUSTOM TITLE - First Principal Component (PC1)",
         xaxis=dict(
             rangeselector=dict(
                 buttons=list(
@@ -139,6 +139,15 @@ def pc1_line_plot(pc1):
                         dict(count=6, label="6m", step="month", stepmode="backward"),
                         dict(count=1, label="YTD", step="year", stepmode="todate"),
                         dict(count=1, label="1y", step="year", stepmode="backward"),
+                        dict(count=1, label="2y", step="year", stepmode="backward"),
+                        dict(count=1, label="3y", step="year", stepmode="backward"),
+                        dict(count=1, label="4y", step="year", stepmode="backward"),
+                        dict(count=1, label="5y", step="year", stepmode="backward"),
+                        dict(count=1, label="6y", step="year", stepmode="backward"),
+                        dict(count=1, label="7y", step="year", stepmode="backward"),
+                        dict(count=1, label="8y", step="year", stepmode="backward"),
+                        dict(count=1, label="9y", step="year", stepmode="backward"),
+                        dict(count=1, label="10y", step="year", stepmode="backward"),
                         dict(step="all"),
                     ]
                 )
@@ -171,7 +180,7 @@ def plot_unnormalized_series(df):
 
     data = [trace]
     layout = dict(
-        title="Raw Economic Series",
+        title="MAXWELL CUSTOM TITLE - Raw Economic Series",
         autosize=True,
         xaxis=dict(
             rangeselector=dict(
@@ -181,6 +190,15 @@ def plot_unnormalized_series(df):
                         dict(count=6, label="6m", step="month", stepmode="backward"),
                         dict(count=1, label="YTD", step="year", stepmode="todate"),
                         dict(count=1, label="1y", step="year", stepmode="backward"),
+                        dict(count=1, label="2y", step="year", stepmode="backward"),
+                        dict(count=1, label="3y", step="year", stepmode="backward"),
+                        dict(count=1, label="4y", step="year", stepmode="backward"),
+                        dict(count=1, label="5y", step="year", stepmode="backward"),
+                        dict(count=1, label="6y", step="year", stepmode="backward"),
+                        dict(count=1, label="7y", step="year", stepmode="backward"),
+                        dict(count=1, label="8y", step="year", stepmode="backward"),
+                        dict(count=1, label="9y", step="year", stepmode="backward"),
+                        dict(count=1, label="10y", step="year", stepmode="backward"),
                         dict(step="all"),
                     ]
                 )
@@ -223,7 +241,7 @@ def plot_normalized_series(dfn):
 
     data = [trace]
     layout = dict(
-        title="Transformed and Normalized Series",
+        title="MAXWELL CUSTOM TITLE - Transformed and Normalized Series",
         autosize=True,
         xaxis=dict(
             rangeselector=dict(
@@ -233,6 +251,15 @@ def plot_normalized_series(dfn):
                         dict(count=6, label="6m", step="month", stepmode="backward"),
                         dict(count=1, label="YTD", step="year", stepmode="todate"),
                         dict(count=1, label="1y", step="year", stepmode="backward"),
+                        dict(count=1, label="2y", step="year", stepmode="backward"),
+                        dict(count=1, label="3y", step="year", stepmode="backward"),
+                        dict(count=1, label="4y", step="year", stepmode="backward"),
+                        dict(count=1, label="5y", step="year", stepmode="backward"),
+                        dict(count=1, label="6y", step="year", stepmode="backward"),
+                        dict(count=1, label="7y", step="year", stepmode="backward"),
+                        dict(count=1, label="8y", step="year", stepmode="backward"),
+                        dict(count=1, label="9y", step="year", stepmode="backward"),
+                        dict(count=1, label="10y", step="year", stepmode="backward"),
                         dict(step="all"),
                     ]
                 )
