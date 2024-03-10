@@ -1,4 +1,4 @@
-Project Title HERE
+Maxwell Dender Custom Title Edit (Project Title HERE)
 ==================
 
 # About this project
