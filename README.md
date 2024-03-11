@@ -1,4 +1,4 @@
-Maxwell Dender Custom Title Edit (Project Title HERE)
+Maxwell Dender Custom Title Edit (Project Title HERE): Maxwell Dender Comments - I updated the logo.png, charts, and website title /  url per the instructions but my website does not pull the same files as the one in the in class example. I followed all the instructions i am not sure why but the changes to the code have been made which should make thee necessary modifications to the website in-line with the insturctions. Preview of my logo.png file below and url here for proof of completion. Please see code adjusting the title and functionality of the plots as well. Thank you, Maxwell Dender
 ==================
 
 # PLEASE READ ME BELOW
