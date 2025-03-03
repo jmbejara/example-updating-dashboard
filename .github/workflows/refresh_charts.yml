@@ -1,5 +1,22 @@
 name: Refresh Charts and Deploy to GitHub Pages
 
+# Note about cron schedule:
+#
+# ┌───────────── minute (0-59)
+# │ ┌───────────── hour (0-23)
+# │ │ ┌───────────── day of month (1-31)
+# │ │ │ ┌───────────── month (1-12)
+# │ │ │ │ ┌───────────── day of week (0-6) (Sunday=0)
+# │ │ │ │ │
+# 0 10 * * *
+# So 0 10 * * * means "Run every day at 10:00 AM".
+# Common patterns:
+# */5 * * * * = every 5 minutes
+# 0 */2 * * * = every 2 hours at the top of the hour
+# 0 0 * * * = daily at midnight
+# 0 0 * * 0 = every Sunday at midnight
+# GitHub Actions runs cron jobs in UTC timezone.
+
 on:
   push:
     branches:
