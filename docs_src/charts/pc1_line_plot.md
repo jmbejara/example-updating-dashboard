@@ -1,0 +1,1 @@
+This chart shows the principal component 1 of the normalized series.

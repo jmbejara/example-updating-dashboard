@@ -29,7 +29,7 @@ fred_series_short_names = {
 
 
 def load_fred(data_dir=DATA_DIR, convert_names=True):
-    file_path = Path(data_dir) / "pulled" / "fred.csv"
+    file_path = Path(data_dir) / "fred.csv"
     df = pd.read_csv(file_path, parse_dates=["DATE"])
     df = df.set_index("DATE")
     # df = pd.read_parquet(file_path)
@@ -63,6 +63,6 @@ if __name__ == "__main__":
         start_date="1913-01-01",
         end_date=today,
     )
-    dirpath = DATA_DIR / "pulled"
+    dirpath = DATA_DIR
     dirpath.mkdir(exist_ok=True)
     df.to_csv(dirpath / "fred.csv")

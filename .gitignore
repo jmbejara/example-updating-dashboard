@@ -30,6 +30,7 @@ drafts/draft_bp.pdf
 # Sphinx build files
 _docs/
 docs/
+_docs_src/
 
 ##############
 #Excluded PDFs

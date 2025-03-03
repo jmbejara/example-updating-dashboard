@@ -12,9 +12,53 @@ import sys
 sys.path.insert(1, "./src/")
 
 import shutil
-from os import environ, getcwd, path
+from os import environ, getcwd, listdir, path
 from pathlib import Path
+
+from colorama import Fore, Style, init
+
+## Custom reporter: Print PyDoit Text in Green
+# This is helpful because some tasks write to sterr and pollute the output in
+# the console. I don't want to mute this output, because this can sometimes
+# cause issues when, for example, LaTeX hangs on an error and requires
+# presses on the keyboard before continuing. However, I want to be able
+# to easily see the task lines printed by PyDoit. I want them to stand out
+# from among all the other lines printed to the console.
+from doit.reporter import ConsoleReporter
+
 from settings import config
+
+try:
+    in_slurm = environ["SLURM_JOB_ID"] is not None
+except:
+    in_slurm = False
+
+
+class GreenReporter(ConsoleReporter):
+    def write(self, stuff, **kwargs):
+        doit_mark = stuff.split(" ")[0].ljust(2)
+        task = " ".join(stuff.split(" ")[1:]).strip() + "\n"
+        output = (
+            Fore.GREEN
+            + doit_mark
+            + f" {path.basename(getcwd())}: "
+            + task
+            + Style.RESET_ALL
+        )
+        self.outstream.write(output)
+
+
+if not in_slurm:
+    DOIT_CONFIG = {
+        "reporter": GreenReporter,
+        # other config here...
+        # "cleanforget": True, # Doit will forget about tasks that have been cleaned.
+        "backend": "sqlite3",
+        "dep_file": "./.doit-db.sqlite",
+    }
+else:
+    DOIT_CONFIG = {"backend": "sqlite3", "dep_file": "./.doit-db.sqlite"}
+init(autoreset=True)
 
 DATA_DIR = config("DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
@@ -66,23 +110,39 @@ def task_config():
     }
 
 
-
 def task_pull_fred():
     """ """
-    file_dep = ["./src/pull_fred.py"]
-    file_output = ["fred.csv"]
-    targets = [DATA_DIR / "pulled" / file for file in file_output]
-
     return {
         "actions": [
             "ipython ./src/pull_fred.py",
         ],
-        "targets": targets,
-        "file_dep": file_dep,
+        "targets": [
+            DATA_DIR / "fred.csv",
+        ],
+        "file_dep": ["./src/pull_fred.py"],
         "clean": True,
     }
 
 
+def task_pca_charts():
+    """ """
+    return {
+        "actions": [
+            "ipython ./src/pca_index.py",
+        ],
+        "targets": [
+            DATA_DIR / "pc1.parquet",
+            DATA_DIR / "pc1.xlsx",
+            DATA_DIR / "dfn.parquet",
+            DATA_DIR / "dfn.xlsx",
+            OUTPUT_DIR / "pc1_line_plot.html",
+        ],
+        "file_dep": [
+            "./src/pca_index.py",
+            "./src/pull_fred.py",
+        ],
+        "clean": True,
+    }
 
 
 notebook_tasks = {
@@ -90,7 +150,7 @@ notebook_tasks = {
         "file_dep": [
             "./src/pull_fred.py",
             "./src/pca_index.py",
-            ],
+        ],
         "targets": [],
     },
     "02_pca_index_dashboard.ipynb": {
@@ -160,16 +220,11 @@ def task_run_notebooks():
 # fmt: on
 
 
-notebook_sphinx_pages = [
-    "./docs/notebooks/EX_" + notebook.split(".")[0] + ".html"
-    for notebook in notebook_tasks.keys()
-]
 sphinx_targets = [
     "./docs/index.html",
     "./docs/myst_markdown_demos.html",
-    "./docs/apidocs/index.html",
-    *notebook_sphinx_pages,
 ]
+
 
 def task_compile_sphinx_docs():
     """Compile Sphinx Docs"""
@@ -181,6 +236,8 @@ def task_compile_sphinx_docs():
         "./README.md",
         "./pipeline.json",
         *notebook_scripts,
+        # add everything in docs_srs as a dependency
+        *[str(file) for file in Path("./docs_src").glob("**/*") if file.is_file()],
     ]
 
     return {
@@ -190,6 +247,8 @@ def task_compile_sphinx_docs():
         # "actions": ["sphinx-build -M html ./docs/ ./docs/_build"], # Previous standard organization
         "targets": sphinx_targets,
         "file_dep": file_dep,
-        "task_dep": ["run_notebooks",],
+        "task_dep": [
+            "run_notebooks",
+        ],
         "clean": True,
     }

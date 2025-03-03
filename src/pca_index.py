@@ -12,7 +12,7 @@ import pull_fred
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-
+OUTPUT_DIR = config("OUTPUT_DIR")
 
 def transform_series(df):
     """
@@ -147,7 +147,7 @@ def pc1_line_plot(pc1):
     )
 
     fig = go.FigureWidget(data=data, layout=layout)
-    fig.show()
+    return fig
 
 
 def plot_unnormalized_series(df):
@@ -200,7 +200,7 @@ def plot_unnormalized_series(df):
     )
 
     fig = go.FigureWidget(data=data, layout=layout)
-    fig.show()
+    return fig
 
 
 def plot_normalized_series(dfn):
@@ -252,7 +252,7 @@ def plot_normalized_series(dfn):
     )
 
     fig = go.FigureWidget(data=data, layout=layout)
-    fig.show()
+    return fig
 
 
 def _demo():
@@ -268,7 +268,8 @@ def _demo():
     fig.show()
 
     # Using slider and quick views
-    pc1_line_plot(pc1)
+    fig = pc1_line_plot(pc1)
+    fig.show()
 
     ## Visualize normalized and raw series
     dfn.plot(subplots=True, figsize=(10, 10))
@@ -277,8 +278,10 @@ def _demo():
     fig.update_yaxes(matches=None)
     fig.show()
 
-    plot_unnormalized_series(df)
-    plot_normalized_series(dfn)
+    fig = plot_unnormalized_series(df)
+    fig.show()
+    fig = plot_normalized_series(dfn)
+    fig.show()
 
     # Other Charts that Need Work
     stacked_plot(dfn)
@@ -298,3 +301,29 @@ def _demo():
         dfn_long, x="DATE", y="value", color="variable", title="Long-Form Input"
     )
     fig.show()
+
+if __name__ == "__main__":
+    df = pull_fred.load_fred(data_dir=DATA_DIR)
+    dfn = transform_series(df)
+    # dfn.info()
+
+    dfn.to_parquet(DATA_DIR / "dfn.parquet")
+    dfn.to_excel(DATA_DIR / "dfn.xlsx")
+
+    ## Visualize Principal Component 1
+    pc1, loadings = pca(dfn, module="scikitlearn")
+
+    # Convert pc1 to a pandas DataFrame
+    pc1.to_frame().to_parquet(DATA_DIR / "pc1.parquet")
+    pc1.to_excel(DATA_DIR / "pc1.xlsx")
+
+    # Using slider and quick views
+    fig = pc1_line_plot(pc1)
+    fig.write_html(OUTPUT_DIR / "pc1_line_plot.html", include_plotlyjs="cdn")
+
+    # Plot unnormalized and normalized series
+    fig = plot_unnormalized_series(df)
+    fig.write_html(OUTPUT_DIR / "unnormalized_series.html", include_plotlyjs="cdn")
+    fig = plot_normalized_series(dfn)
+    fig.write_html(OUTPUT_DIR / "normalized_series.html", include_plotlyjs="cdn")
+
