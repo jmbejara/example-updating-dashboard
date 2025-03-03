@@ -87,12 +87,16 @@ def task_pull_fred():
 
 notebook_tasks = {
     "01_pca_index_visualizations.ipynb": {
-        "file_dep": ["./src/pull_fred.py"],
+        "file_dep": [
+            "./src/pull_fred.py",
+            "./src/pca_index.py",
+            ],
         "targets": [],
     },
     "02_pca_index_dashboard.ipynb": {
         "file_dep": [
             "./src/pull_fred.py",
+            "./src/pca_index.py",
         ],
         "targets": [],
     },
