@@ -10,6 +10,9 @@ jobs:
   refresh-charts:
     runs-on: ubuntu-latest
 
+    env:
+      TZ: "America/New_York"
+
     steps:
     - name: Checkout main branch
       uses: actions/checkout@v4
