@@ -1,23 +1,26 @@
-name: Refresh charts
+name: Refresh Charts and Deploy to GitHub Pages
 
 on:
   schedule:
     # - cron: '*/5 * * * *' # Every 5 minutes
-    - cron: '0 10 * * *' # Every day at 10 am in the morning
-  workflow_dispatch:
+    - cron: '0 10 * * *' # Every day at 10 AM
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   refresh-charts:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout main branch
+      uses: actions/checkout@v4
       with:
-        ref: 'gh-actions-update'
+        ref: 'main'
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.11'
+
     - name: Cache Python environment
       id: cache-python-env
       uses: actions/cache@v3
@@ -26,22 +29,38 @@ jobs:
         key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt', '**/.python-version') }}
         restore-keys: |
           ${{ runner.os }}-venv-
+
     - name: Install Python environment
       if: steps.cache-python-env.outputs.cache-hit != 'true'
       run: |
         python -m venv .venv
         source .venv/bin/activate
         pip install -r requirements.txt
-    - name: Run project code
+
+    - name: Run project code to generate charts
       run: |
         source .venv/bin/activate
         doit
-        cp -r ./docs/_build/html/* ./docs/
-    - name: Commit changes
-      uses: EndBug/add-and-commit@v9
-      with:
-        default_author: github_actor
-        add: 'docs/* --force'
-        new_branch: gh-actions-update
-        pull: 'origin gh-actions-update --rebase --autostash'
-        push: 'origin gh-actions-update --force'
+
+    - name: Setup Git
+      run: |
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "actions@github.com"
+
+    - name: Create/Update gh-pages branch
+      run: |
+        # Create a new branch from current main or update existing one
+        git checkout -B gh-pages
+        
+        # Force add the docs directory (override gitignore)
+        git add -f docs/
+        
+        # Commit changes
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update charts and documentation [skip ci]"
+        fi
+        
+        # Force push to gh-pages
+        git push -f origin gh-pages
