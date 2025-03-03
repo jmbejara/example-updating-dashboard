@@ -1,0 +1,23 @@
+{
+    "DASH":{
+        "chartbook_format_version": "0.0.1",
+        "pipeline_name": "Automated Dashboard Update",
+        "pipeline_description": "Demo for automatically updating a dashboard.",
+        "lead_pipeline_developer": "Jeremiah Bejarano",
+        "contributors": [
+            "Jeremiah Bejarano"
+        ],
+        "software_modules_command": "module load anaconda3/3.11.4",
+        "runs_on_grid_or_windows_or_other": "Windows/Linux/MacOS",
+        "git_repo_URL": "https://github.com/jmbejara/example-updating-dashboard",
+        "README_file_path": "./README.md",
+        "dataframes": {
+        },
+        "charts": {
+        },
+        "notebooks": [
+            "_output/01_pca_index_visualizations.ipynb",
+            "_output/02_pca_index_dashboard.ipynb"
+        ]
+    }
+}

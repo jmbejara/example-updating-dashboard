@@ -1,19 +1,17 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
-
+import plotly.express as px
+import plotly.graph_objs as go
 import sklearn.decomposition
 import statsmodels.multivariate.pca
+from matplotlib import pyplot as plt
 
-import plotly.io as pio
-import plotly.express as px
-import plotly.offline as py
-import plotly.graph_objs as go
+import pull_fred
+from settings import config
 
-import config
-import load_fred
-
-DATA_DIR = config.DATA_DIR
+DATA_DIR = config("DATA_DIR")
 
 
 def transform_series(df):
@@ -112,7 +110,7 @@ def stacked_plot(df, filename=None):
     # ax.set_ylim(-3,4)
     # ax.set_ylim(-30,30)
 
-    if not (filename is None):
+    if filename is not None:
         filename = Path(filename)
         figure = plt.gcf()  # get current figure
         figure.set_size_inches(8, 6)
@@ -153,7 +151,6 @@ def pc1_line_plot(pc1):
 
 
 def plot_unnormalized_series(df):
-
     series_names = [
         "High Yield Index OAS",
         "NASDAQ",
@@ -259,7 +256,7 @@ def plot_normalized_series(dfn):
 
 
 def _demo():
-    df = load_fred.load_fred(data_dir=DATA_DIR)
+    df = pull_fred.load_fred(data_dir=DATA_DIR)
     dfn = transform_series(df)
 
     ## Visualize Principal Component 1
@@ -297,5 +294,7 @@ def _demo():
         .rename(columns={0: "value", "level_1": "variable"})
     )
 
-    fig = px.bar(dfn_long, x="DATE", y="value", color="variable", title="Long-Form Input")
+    fig = px.bar(
+        dfn_long, x="DATE", y="value", color="variable", title="Long-Form Input"
+    )
     fig.show()

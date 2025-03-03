@@ -1,72 +1,81 @@
 """Run or update the project. This file uses the `doit` Python package. It works
 like a Makefile, but is Python-based
+
 """
 
+#######################################
+## Configuration and Helpers for PyDoit
+#######################################
+## Make sure the src folder is in the path
 import sys
+
 sys.path.insert(1, "./src/")
 
-
-import config
+import shutil
+from os import environ, getcwd, path
 from pathlib import Path
-from doit.tools import run_once
-import platform
+from settings import config
 
-OUTPUT_DIR = Path(config.OUTPUT_DIR)
-DATA_DIR = Path(config.DATA_DIR)
+DATA_DIR = config("DATA_DIR")
+OUTPUT_DIR = config("OUTPUT_DIR")
 
+## Helpers for handling Jupyter Notebook tasks
 # fmt: off
 ## Helper functions for automatic execution of Jupyter notebooks
+environ["PYDEVD_DISABLE_FILE_VALIDATION"] = "1"
 def jupyter_execute_notebook(notebook):
-    return f"jupyter nbconvert --execute --to notebook --inplace ./src/{notebook}.ipynb"
+    return f"jupyter nbconvert --execute --to notebook --ClearMetadataPreprocessor.enabled=True --log-level WARN --inplace ./src/{notebook}.ipynb"
 def jupyter_to_html(notebook, output_dir=OUTPUT_DIR):
-    return f"jupyter nbconvert --to html --output-dir={output_dir} ./src/{notebook}.ipynb"
+    return f"jupyter nbconvert --to html --log-level WARN --output-dir={output_dir} ./src/{notebook}.ipynb"
 def jupyter_to_md(notebook, output_dir=OUTPUT_DIR):
     """Requires jupytext"""
-    return f"jupytext --to markdown --output-dir={output_dir} ./src/{notebook}.ipynb"
+    return f"jupytext --to markdown --log-level WARN --output-dir={output_dir} ./src/{notebook}.ipynb"
 def jupyter_to_python(notebook, build_dir):
     """Convert a notebook to a python script"""
-    return f"jupyter nbconvert --to python ./src/{notebook}.ipynb --output _{notebook}.py --output-dir {build_dir}"
+    return f"jupyter nbconvert --log-level WARN --to python ./src/{notebook}.ipynb --output _{notebook}.py --output-dir {build_dir}"
 def jupyter_clear_output(notebook):
-    return f"jupyter nbconvert --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --inplace ./src/{notebook}.ipynb"
+    return f"jupyter nbconvert --log-level WARN --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --inplace ./src/{notebook}.ipynb"
 # fmt: on
 
 
-def get_os():
-    os_name = platform.system()
-    if os_name == "Windows":
-        return "windows"
-    elif os_name == "Darwin":
-        return "nix"
-    elif os_name == "Linux":
-        return "nix"
-    else:
-        return "unknown"
+def copy_file(origin_path, destination_path, mkdir=True):
+    """Create a Python action for copying a file."""
+
+    def _copy_file():
+        origin = Path(origin_path)
+        dest = Path(destination_path)
+        if mkdir:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(origin, dest)
+
+    return _copy_file
 
 
-os_type = get_os()
+##################################
+## Begin rest of PyDoit tasks here
+##################################
 
 
-def copy_notebook_to_folder(notebook_stem, origin_folder, destination_folder):
-    origin_path = Path(origin_folder) / f"{notebook_stem}.ipynb"
-    destination_folder = Path(destination_folder)
-    destination_folder.mkdir(parents=True, exist_ok=True)
-    destination_path = destination_folder / f"_{notebook_stem}.ipynb"
-    if os_type == "nix":
-        command = f"cp {origin_path} {destination_path}"
-    else:
-        command = f"copy  {origin_path} {destination_path}"
-    return command
+def task_config():
+    """Create empty directories for data and output if they don't exist"""
+    return {
+        "actions": ["ipython ./src/settings.py"],
+        "targets": [DATA_DIR, OUTPUT_DIR],
+        "file_dep": ["./src/settings.py"],
+        "clean": [],
+    }
+
 
 
 def task_pull_fred():
     """ """
-    file_dep = ["./src/load_fred.py"]
+    file_dep = ["./src/pull_fred.py"]
     file_output = ["fred.csv"]
     targets = [DATA_DIR / "pulled" / file for file in file_output]
 
     return {
         "actions": [
-            "ipython ./src/load_fred.py",
+            "ipython ./src/pull_fred.py",
         ],
         "targets": targets,
         "file_dep": file_dep,
@@ -74,133 +83,109 @@ def task_pull_fred():
     }
 
 
+
+
+notebook_tasks = {
+    "01_pca_index_visualizations.ipynb": {
+        "file_dep": ["./src/pull_fred.py"],
+        "targets": [],
+    },
+    "02_pca_index_dashboard.ipynb": {
+        "file_dep": [
+            "./src/pull_fred.py",
+        ],
+        "targets": [],
+    },
+}
+
+
 def task_convert_notebooks_to_scripts():
-    """Preps the notebooks for presentation format.
-    Execute notebooks with summary stats and plots and remove metadata.
+    """Convert notebooks to script form to detect changes to source code rather
+    than to the notebook's metadata.
     """
     build_dir = Path(OUTPUT_DIR)
-    build_dir.mkdir(parents=True, exist_ok=True)
 
-    notebooks = [
-        "01_example_notebook.ipynb",
-        "02_pca_index_visualizations.ipynb",
-    ]
-    file_dep = [Path("./src") / file for file in notebooks]
-    stems = [notebook.split(".")[0] for notebook in notebooks]
-    targets = [build_dir / f"_{stem}.py" for stem in stems]
-
-    actions = [
-        # *[jupyter_execute_notebook(notebook) for notebook in notebooks_to_run],
-        # *[jupyter_to_html(notebook) for notebook in notebooks_to_run],
-        *[jupyter_clear_output(notebook) for notebook in stems],
-        *[jupyter_to_python(notebook, build_dir) for notebook in stems],
-    ]
-    return {
-        "actions": actions,
-        "targets": targets,
-        "task_dep": [],
-        "file_dep": file_dep,
-        "clean": True,
-    }
+    for notebook in notebook_tasks.keys():
+        notebook_name = notebook.split(".")[0]
+        yield {
+            "name": notebook,
+            "actions": [
+                jupyter_clear_output(notebook_name),
+                jupyter_to_python(notebook_name, build_dir),
+            ],
+            "file_dep": [Path("./src") / notebook],
+            "targets": [OUTPUT_DIR / f"_{notebook_name}.py"],
+            "clean": True,
+            "verbosity": 0,
+        }
 
 
+# fmt: off
 def task_run_notebooks():
     """Preps the notebooks for presentation format.
-    Execute notebooks with summary stats and plots and remove metadata.
+    Execute notebooks if the script version of it has been changed.
     """
-    notebooks = [
-        "01_example_notebook.ipynb",
-        "02_pca_index_visualizations.ipynb",
-    ]
-    stems = [notebook.split(".")[0] for notebook in notebooks]
-
-    file_dep = [
-        # 'load_other_data.py',
-        *[Path(OUTPUT_DIR) / f"_{stem}.py" for stem in stems],
-    ]
-
-    targets = [
-        ## 01_example_notebook.ipynb output
-        OUTPUT_DIR / "sine_graph.png",
-        ## Notebooks converted to HTML
-        *[OUTPUT_DIR / f"{stem}.html" for stem in stems],
-    ]
-
-    actions = [
-        *[jupyter_execute_notebook(notebook) for notebook in stems],
-        *[jupyter_to_html(notebook) for notebook in stems],
-        *[copy_notebook_to_folder(notebook, Path("./src"), "./docs/_notebook_build/") for notebook in stems],
-        *[jupyter_clear_output(notebook) for notebook in stems],
-        # *[jupyter_to_python(notebook, build_dir) for notebook in notebooks_to_run],
-    ]
-    return {
-        "actions": actions,
-        "targets": targets,
-        "task_dep": [],
-        "file_dep": file_dep,
-        "clean": True,
-    }
+    for notebook in notebook_tasks.keys():
+        notebook_name = notebook.split(".")[0]
+        yield {
+            "name": notebook,
+            "actions": [
+                """python -c "import sys; from datetime import datetime; print(f'Start """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
+                jupyter_execute_notebook(notebook_name),
+                jupyter_to_html(notebook_name),
+                copy_file(
+                    Path("./src") / f"{notebook_name}.ipynb",
+                    OUTPUT_DIR / f"{notebook_name}.ipynb",
+                    mkdir=True,
+                ),
+                jupyter_clear_output(notebook_name),
+                # jupyter_to_python(notebook_name, build_dir),
+                """python -c "import sys; from datetime import datetime; print(f'End """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
+            ],
+            "file_dep": [
+                OUTPUT_DIR / f"_{notebook_name}.py",
+                *notebook_tasks[notebook]["file_dep"],
+            ],
+            "targets": [
+                OUTPUT_DIR / f"{notebook_name}.html",
+                OUTPUT_DIR / f"{notebook_name}.ipynb",
+                *notebook_tasks[notebook]["targets"],
+            ],
+            "clean": True,
+        }
+# fmt: on
 
 
-
-def task_run_notebooks_no_clear():
-    """Preps the notebooks for presentation format.
-    Execute notebooks with summary stats and plots and remove metadata.
-    """
-    notebooks = [
-        "03_pca_index_dashboard.ipynb",
-    ]
-    stems = [notebook.split(".")[0] for notebook in notebooks]
-
-    file_dep = [
-        # 'load_other_data.py',
-        *[Path("./src/") / notebook for notebook in notebooks],
-    ]
-
-    targets = [
-        ## Notebooks converted to HTML
-        *[OUTPUT_DIR / f"{stem}.html" for stem in stems],
-    ]
-
-    actions = [
-        *[jupyter_execute_notebook(notebook) for notebook in stems],
-        *[jupyter_to_html(notebook) for notebook in stems],
-        *[copy_notebook_to_folder(notebook, Path("./src"), "./docs/_notebook_build/") for notebook in stems],
-        # *[jupyter_clear_output(notebook) for notebook in stems],
-        # *[jupyter_to_python(notebook, build_dir) for notebook in notebooks_to_run],
-    ]
-    return {
-        "actions": actions,
-        "targets": targets,
-        "task_dep": [],
-        "file_dep": file_dep,
-        "clean": True,
-    }
-
-
+notebook_sphinx_pages = [
+    "./docs/notebooks/EX_" + notebook.split(".")[0] + ".html"
+    for notebook in notebook_tasks.keys()
+]
+sphinx_targets = [
+    "./docs/index.html",
+    "./docs/myst_markdown_demos.html",
+    "./docs/apidocs/index.html",
+    *notebook_sphinx_pages,
+]
 
 def task_compile_sphinx_docs():
     """Compile Sphinx Docs"""
-    file_dep = [
-        "./docs/conf.py",
-        "./docs/index.rst",
-        "./docs/myst_markdown_demos.md",
-        "./docs/api.rst",
-        "./src/01_example_notebook.ipynb",
-        "./src/02_pca_index_visualizations.ipynb",
-        "./src/03_pca_index_dashboard.ipynb",
+    notebook_scripts = [
+        OUTPUT_DIR / ("_" + notebook.split(".")[0] + ".py")
+        for notebook in notebook_tasks.keys()
     ]
-    targets = [
-        "./docs/_build/html/index.html",
-        "./docs/_build/html/myst_markdown_demos.html",
-        "./docs/_build/html/api.html",
+    file_dep = [
+        "./README.md",
+        "./pipeline.json",
+        *notebook_scripts,
     ]
 
     return {
-        "actions": ["sphinx-build -M html ./docs/ ./docs/_build"],
-        "targets": targets,
+        "actions": [
+            "chartbook generate -f",
+        ],  # Use docs as build destination
+        # "actions": ["sphinx-build -M html ./docs/ ./docs/_build"], # Previous standard organization
+        "targets": sphinx_targets,
         "file_dep": file_dep,
-        "task_dep": ["run_notebooks"],
+        "task_dep": ["run_notebooks",],
         "clean": True,
     }
-
