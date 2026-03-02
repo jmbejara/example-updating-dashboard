@@ -73,19 +73,18 @@ jobs:
 
     - name: Create/Update gh-pages branch
       run: |
-        # Create a new branch from current main or update existing one
-        git checkout -B gh-pages
-        
-        # Force add the docs directory (override gitignore)
+        # Preserve generated docs before switching branches
+        cp -r docs/ /tmp/docs-stage/
+
+        # Create a fresh orphan branch so gh-pages always has exactly one commit
+        git checkout --orphan gh-pages
+        git rm -rf .
+
+        # Restore the docs directory and commit
+        cp -r /tmp/docs-stage/ docs/
         git add -f docs/
-        
-        # Commit changes
-        # Checks to see if there are any changes to commit
-        if git diff --cached --quiet; then
-          echo "No changes to commit"
-        else
-          git commit -m "Update charts and documentation [skip ci]"
-        fi
-        
-        # Force push to gh-pages
+
+        git commit -m "Update charts and documentation [skip ci]"
+
+        # Force push to remote gh-pages
         git push -f origin gh-pages
