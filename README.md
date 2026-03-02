@@ -3,7 +3,9 @@ Automatically Updating Dashboard Example
 
 # About this project
 
-This example uses GitHub Actions to automatically update a dashboard. The dashboard consists of a Sphinx site that is published to GitHub Pages. The Sphinx site is generated using a custom tool called ChartBook: https://github.com/jmbejara/chartbook 
+This example uses GitHub Actions to automatically update a dashboard. The dashboard consists of a Sphinx site that is published to GitHub Pages. The Sphinx site is generated using a custom tool called ChartBook: https://github.com/jmbejara/chartbook
+
+The documentation for ChartBook is available here: https://backofficedev.github.io/chartbook
 
 
 
