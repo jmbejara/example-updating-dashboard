@@ -1,0 +1,7 @@
+Name,Metadata Complete,Object Type,Identifier,Pipeline,Missing Fields,Page Link
+Automated Dashboard Update,False,pipeline,DASH,DASH,"build_commands, os_compatibility",../index.html
+Normalized Series,True,dataframe,normalized_series,DASH,,../dataframes/DASH/normalized_series.html
+Principal Component 1,True,dataframe,pc1,DASH,,../dataframes/DASH/pc1.html
+Principal Component 1 Line Plot,False,chart,pc1_line_plot,DASH,data_release_timing,../charts/DASH.pc1_line_plot.html
+Unnormalized Series,False,chart,unnormalized_series_chart,DASH,data_release_timing,../charts/DASH.unnormalized_series_chart.html
+Normalized Series,False,chart,normalized_series_chart,DASH,data_release_timing,../charts/DASH.normalized_series_chart.html
