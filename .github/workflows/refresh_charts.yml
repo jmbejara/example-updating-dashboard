@@ -21,9 +21,9 @@ on:
   push:
     branches:
       - main
-  schedule:
+  # schedule:
     # - cron: '*/5 * * * *' # Every 5 minutes
-    - cron: '0 10 * * *' # Every day at 10 AM
+    # - cron: '0 10 * * *' # Every day at 10 AM
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
